@@ -1,0 +1,25 @@
+{
+  "name": "desafio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcelestino/desafio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bcelestino/desafio/issues"
+  },
+  "homepage": "https://github.com/bcelestino/desafio#readme",
+  "description": "",
+  "devDependencies": {
+    "cypress": "^14.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "newman": "^6.2.1"
+  }
+}
