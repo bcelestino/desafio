@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "42585b88-433e-4e5c-bc52-399604f7c713",
+		"name": "Softdev",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "34483634",
+		"_collection_link": "https://www.postman.com/apiteste-8419/workspace/desafio/collection/34483634-42585b88-433e-4e5c-bc52-399604f7c713?action=share&source=collection_link&creator=34483634"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Autenticação de Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is less than 400ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response schema includes all required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.all.keys('accessToken', 'refreshToken', 'id', 'username', 'email', 'firstName', 'lastName', 'gender', 'image');",
+									"});",
+									"",
+									"",
+									"pm.test(\"AccessToken is a non-empty string\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.accessToken).to.exist.and.to.be.a('string').and.to.have.lengthOf.above(0, \"AccessToken should not be empty\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Email is in a valid format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.email).to.exist;",
+									"    pm.expect(responseData.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");",
+									"});",
+									"",
+									"// Captura a resposta",
+									"const res = pm.response.json();",
+									"",
+									"// Salva os dois tokens no ambiente",
+									"pm.environment.set(\"accessToken\", res.accessToken);",
+									"pm.environment.set(\"refreshToken\", res.refreshToken);",
+									"",
+									"// (Opcional) Verificação de existência",
+									"pm.test(\"Tokens presentes\", function () {",
+									"    pm.expect(res.accessToken).to.be.a(\"string\");",
+									"    pm.expect(res.refreshToken).to.be.a(\"string\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"emilys\",\n  \"password\": \"emilyspass\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/login"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "Verificação de todos Usuários",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"Validate users array structure and ensure it contains the expected fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('users').that.is.an('array');",
+									"",
+									"    responseData.users.forEach(user => {",
+									"        pm.expect(user).to.be.an('object');",
+									"        pm.expect(user).to.have.all.keys(",
+									"            'id', 'firstName', 'lastName', 'maidenName', 'age', 'gender', ",
+									"            'email', 'phone', 'username', 'password', 'birthDate', ",
+									"            'image', 'bloodGroup', 'height', 'weight', 'eyeColor', ",
+									"            'hair', 'ip', 'address', 'macAddress', 'university', ",
+									"            'bank', 'company', 'ein', 'ssn', 'userAgent', 'crypto', 'role'",
+									"        );",
+									"        ",
+									"        pm.expect(user.hair).to.be.an('object').that.has.all.keys('color', 'type');",
+									"        pm.expect(user.address).to.be.an('object').that.has.all.keys(",
+									"            'address', 'city', 'state', 'stateCode', 'postalCode', 'coordinates', 'country'",
+									"        );",
+									"        pm.expect(user.address.coordinates).to.be.an('object').that.has.all.keys('lat', 'lng'); // Fixed from user.coordinates",
+									"        pm.expect(user.bank).to.be.an('object').that.has.all.keys(",
+									"            'cardExpire', 'cardNumber', 'cardType', 'currency', 'iban'",
+									"        );",
+									"        pm.expect(user.company).to.be.an('object').that.has.all.keys(",
+									"            'department', 'name', 'title', 'address'",
+									"        );",
+									"        pm.expect(user.company.address).to.be.an('object').that.has.all.keys(",
+									"            'address', 'city', 'state', 'stateCode', 'postalCode', 'coordinates', 'country'",
+									"        );",
+									"        pm.expect(user.company.address.coordinates).to.be.an('object').that.has.all.keys('lat', 'lng');",
+									"        pm.expect(user.crypto).to.be.an('object').that.has.all.keys('coin', 'wallet', 'network');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Email is in a valid format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.users).to.be.an('array').that.is.not.empty;",
+									"",
+									"    responseData.users.forEach(user => {",
+									"        pm.expect(user.email).to.exist;",
+									"        pm.expect(user.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 400ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"});",
+									"",
+									"pm.test(\"Total, skip, and limit are non-negative integers\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.total).to.be.a('number').and.to.be.at.least(0);",
+									"    pm.expect(responseData.skip).to.be.a('number').and.to.be.at.least(0);",
+									"    pm.expect(responseData.limit).to.be.a('number').and.to.be.at.least(0);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/users"
+					},
+					"response": []
+				},
+				{
+					"name": "Consulta de Usuário por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 400ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"});",
+									"",
+									"pm.test(\"Email should be in a valid format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.email).to.exist;",
+									"    pm.expect(responseData.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");",
+									"});",
+									"",
+									"var responseData = pm.response.json();",
+									"",
+									"// Test for expected properties in the response body",
+									"pm.test(\"Response body contains expected properties\", function () {",
+									"    pm.expect(responseData).to.be.an('object').that.includes.all.keys(",
+									"        'id', 'firstName', 'lastName', 'maidenName', 'age', 'gender', ",
+									"        'email', 'phone', 'username', 'password', 'birthDate', 'image', ",
+									"        'bloodGroup', 'height', 'weight', 'eyeColor', 'ip', 'address', ",
+									"        'macAddress', 'university', 'bank', 'company', 'ein', 'ssn', ",
+									"        'userAgent', 'crypto', 'role'",
+									"    );",
+									"",
+									"    pm.expect(responseData.address).to.be.an('object').that.includes.all.keys(",
+									"        'address', 'city', 'state', 'stateCode', 'postalCode', 'coordinates', 'country'",
+									"    );",
+									"",
+									"    pm.expect(responseData.address.coordinates).to.be.an('object').that.includes.all.keys(",
+									"        'lat', 'lng'",
+									"    );",
+									"",
+									"    pm.expect(responseData.bank).to.be.an('object').that.includes.all.keys(",
+									"        'cardExpire', 'cardNumber', 'cardType', 'currency', 'iban'",
+									"    );",
+									"",
+									"    pm.expect(responseData.company).to.be.an('object').that.includes.all.keys(",
+									"        'department', 'name', 'title', 'address'",
+									"    );",
+									"",
+									"    pm.expect(responseData.company.address).to.be.an('object').that.includes.all.keys(",
+									"        'address', 'city', 'state', 'stateCode', 'postalCode', 'coordinates', 'country'",
+									"    );",
+									"",
+									"    pm.expect(responseData.company.address.coordinates).to.be.an('object').that.includes.all.keys(",
+									"        'lat', 'lng'",
+									"    );",
+									"",
+									"    pm.expect(responseData.hair).to.be.an('object').that.includes.all.keys(",
+									"        'color', 'type'",
+									"    );",
+									"",
+									"    pm.expect(responseData.crypto).to.be.an('object').that.includes.all.keys(",
+									"        'coin', 'wallet', 'network'",
+									"    );",
+									"});",
+									"",
+									"pm.test(\"Response content type is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Response has a valid user ID\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('id').that.is.a('number').and.is.at.least(0, \"User ID should be a non-negative number\");",
+									"});",
+									"",
+									"pm.test(\"First name and last name must be non-empty strings\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.firstName).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"First name should not be empty\");",
+									"    pm.expect(responseData.lastName).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Last name should not be empty\");",
+									"});",
+									"",
+									"pm.test(\"Age is a non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.age).to.be.a('number').and.to.be.at.least(0);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/users/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "Criação de Produto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.expect(pm.response.code).to.eql(201);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.all.keys('id', 'title', 'price', 'discountPercentage', 'stock', 'rating', 'thumbnail', 'description', 'brand', 'category');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Price is a non-negative number\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.price).to.be.a('number').and.to.be.at.least(0, \"Price should be a non-negative number\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Discount percentage must be between 0 and 100\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.have.property('discountPercentage').that.is.a('number').and.is.at.least(0).and.is.at.most(100);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is less than 400ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Perfume Oil\",\n  \"description\": \"Mega Discount, Impression of A...\",\n  \"price\": 13,\n  \"discountPercentage\": 8.4,\n  \"rating\": 4.26,\n  \"stock\": 65,\n  \"brand\": \"Impression of Acqua Di Gio\",\n  \"category\": \"fragrances\",\n  \"thumbnail\": \"https://i.dummyjson.com/data/products/11/thumnail.jpg\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/products/add"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

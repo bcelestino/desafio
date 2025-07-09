@@ -1,9 +1,16 @@
 {
-  "name": "desafio",
+  "name": "desafiosoft",
   "version": "1.0.0",
   "main": "index.js",
+
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "postman": "newman run postman/desafio_api_collection.json -e postman/desafio_api_environment.json --reporters cli,html --reporter-html-export postman/report.html",
+  "cypress": "cypress open",
+  "test": "cypress run",
+  "load": "k6 run load/users_load_test.js",
+  "load-login": "k6 run load/login_load.js",
+  "teste": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
