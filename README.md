@@ -26,6 +26,7 @@ Este projeto contém um conjunto de automações completas, incluindo testes end
   "newman": "^6.2.1"
 }
 
+```json
 
 ## 📁 Estrutura do projeto
 
@@ -63,13 +64,15 @@ Este projeto contém um conjunto de automações completas, incluindo testes end
 
 ```bash
 git clone https://github.com/bcelestino/desafio
-cd seu-repo
+```bash
 
 
 2️⃣ Instalar as dependências
 
 ```bash
 npm install
+```bash
+
 
 3️⃣ Configurar o .env
 
@@ -82,17 +85,23 @@ O arquivo cypress.env.json já está listado no .gitignore.
 
 ```bash
 npm run test
+```bash
+
 
 Ou para abrir a interface interativa:
 
 ```bash
 npx cypress open
+```bash
+
 
 ✅ Testes Postman (Newman)
 
 
 ```bash
 npm run postman
+```bash
+
 
 
 ✅ Testes de carga (k6)
@@ -100,10 +109,11 @@ npm run postman
 ```bash
 npm run load
 npm run load-login
+```bash
 
 
 
-
+```json
 "scripts": {
     "postman": "newman run postman/Softdev.postman_collection.json -e postman/env_soft.postman_environment.json --reporters cli,html --reporter-html-export postman/report.html",
     "cypress": "cypress open",
@@ -112,7 +122,7 @@ npm run load-login
     "load-login": "dotenv -e .env -- k6 run load/login_load_test.js",
     "teste": "echo \"Error: no test specified\" && exit 1"
 }
-
+```json
 
 
 🤝 Boas práticas aplicadas
