@@ -23,6 +23,7 @@
   "homepage": "https://github.com/bcelestino/desafio#readme",
   "description": "",
   "devDependencies": {
+    "chai-json-schema": "^1.5.1",
     "cypress": "^14.5.1",
     "dotenv": "^17.2.0",
     "jsonwebtoken": "^9.0.2",
