@@ -4,34 +4,73 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   postman:
+    name: Postman Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: npm run postman
+
+      - name: Install dependencies
+        run: npm install dotenv-cli
+
+      - name: Run Postman tests
+        run: npm run postman
 
   cypress:
+    name: Cypress Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: npm run test
+
+      - name: Install dependencies
+        run: npm install dotenv-cli
+
+      - name: Run Cypress tests
+        run: npm run test
 
   load:
+    name: Load Test - Users
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Install k6
         run: sudo snap install k6
-      - run: npm run load
+
+      - name: Install dependencies
+        run: npm install dotenv-cli
+
+      - name: Run k6 load test (users)
+        run: npm run load
+
+  load-login:
+    name: Load Test - Login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install k6
+        run: sudo snap install k6
+
+      - name: Install dependencies
+        run: npm install dotenv-cli
+
+      - name: Run k6 load test (login)
+        run: npm run load-login

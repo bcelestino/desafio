@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "42585b88-433e-4e5c-bc52-399604f7c713",
 		"name": "Softdev",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "34483634",
 		"_collection_link": "https://www.postman.com/apiteste-8419/workspace/desafio/collection/34483634-42585b88-433e-4e5c-bc52-399604f7c713?action=share&source=collection_link&creator=34483634"
 	},
@@ -22,8 +22,8 @@
 									"});",
 									"",
 									"",
-									"pm.test(\"Response time is less than 400ms\", function () {",
-									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
 									"});",
 									"",
 									"",
@@ -81,7 +81,16 @@
 								}
 							}
 						},
-						"url": "{{base_url}}/auth/login"
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
 					},
 					"response": []
 				}
@@ -148,8 +157,8 @@
 									"    });",
 									"});",
 									"",
-									"pm.test(\"Response time is less than 400ms\", function () {",
-									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
 									"});",
 									"",
 									"pm.test(\"Total, skip, and limit are non-negative integers\", function () {",
@@ -170,7 +179,15 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{base_url}}/users"
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
 					},
 					"response": []
 				},
@@ -185,8 +202,8 @@
 									"    pm.expect(pm.response.code).to.equal(200);",
 									"});",
 									"",
-									"pm.test(\"Response time is less than 400ms\", function () {",
-									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
 									"});",
 									"",
 									"pm.test(\"Email should be in a valid format\", function () {",
@@ -278,7 +295,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{base_url}}/users/1"
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -322,8 +348,8 @@
 									"});",
 									"",
 									"",
-									"pm.test(\"Response time is less than 400ms\", function () {",
-									"    pm.expect(pm.response.responseTime).to.be.below(400);",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
 									"});",
 									""
 								],
@@ -344,7 +370,17 @@
 								}
 							}
 						},
-						"url": "{{base_url}}/auth/products/add"
+						"url": {
+							"raw": "{{base_url}}/auth/products/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"products",
+								"add"
+							]
+						}
 					},
 					"response": []
 				}

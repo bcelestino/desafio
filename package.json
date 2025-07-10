@@ -2,15 +2,13 @@
   "name": "desafiosoft",
   "version": "1.0.0",
   "main": "index.js",
-
-
   "scripts": {
-  "postman": "newman run postman/desafio_api_collection.json -e postman/desafio_api_environment.json --reporters cli,html --reporter-html-export postman/report.html",
-  "cypress": "cypress open",
-  "test": "cypress run",
-  "load": "k6 run load/users_load_test.js",
-  "load-login": "k6 run load/login_load.js",
-  "teste": "echo \"Error: no test specified\" && exit 1"
+    "postman": "newman run postman/Softdev.postman_collection.json -e postman/env_soft.postman_environment.json --reporters cli,html --reporter-html-export postman/report.html",
+    "cypress": "cypress open",
+    "test": "cypress run",
+    "load": "dotenv -e .env -- k6 run load/users_load_test.js",
+    "load-login": "dotenv -e .env -- k6 run load/login_load_test.js",
+    "teste": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -26,6 +24,7 @@
   "description": "",
   "devDependencies": {
     "cypress": "^14.5.1",
+    "dotenv": "^17.2.0",
     "jsonwebtoken": "^9.0.2",
     "newman": "^6.2.1"
   }
