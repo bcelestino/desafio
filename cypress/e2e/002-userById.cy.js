@@ -1,33 +1,136 @@
-describe('GET /users/:id', () => {
-  it('Valida status 200 para usuário existente', () => {
-    cy.request('/users/1').then((res) => {
-      expect(res.status).to.eq(200)
-      expect(res.body.id).to.eq(1)
-    })
-  })
+/// <reference types="cypress" />
 
-  it('Valida campos principais do usuário', () => {
-    cy.request('/users/1').then((res) => {
-      expect(res.body).to.have.property('firstName')
-      expect(res.body).to.have.property('lastName')
-      expect(res.body).to.have.property('email').and.to.include('@')
-    })
-  })
+describe('Consulta de Usuário por ID', () => {
+  const userIds = [1, 2, 3]; // IDs para testar
 
-  it('Falha ao buscar usuário inexistente', () => {
+  // Corrigir a leitura do endpoint da variável correta do env (tudo minúsculo)
+  const userBaseEndpoint = Cypress.env('users_endpoint');
+  const expectedFirstName = Cypress.env('first_name');
+  const expectedLastName = Cypress.env('last_name');
+  const expectedEmailDomain = Cypress.env('email_domain');
+
+  before(() => {
+    // Validação simples para garantir que o endpoint foi carregado
+    if (!userBaseEndpoint) {
+      throw new Error('users_endpoint não está definido no Cypress.env');
+    }
+    cy.log('Preparando autenticação antes dos testes');
+    cy.login(); // assumindo que seu comando cy.login() salva o token em Cypress.env('token')
+  });
+
+  beforeEach(() => {
+    cy.log('Iniciando novo teste para GET /users/:id');
+  });
+
+  afterEach(() => {
+    cy.log('Finalizando teste individual');
+  });
+
+  userIds.forEach((userId) => {
+    it(`Deve retornar status 200 para usuário com ID ${userId}`, () => {
+      cy.request({
+        method: 'GET',
+        url: `${userBaseEndpoint}/${userId}`,
+        headers: {
+          Authorization: `Bearer ${Cypress.env('token')}`
+        }
+      }).then((res) => {
+        expect(res.status).to.eq(200);
+        expect(res.body.id).to.eq(userId);
+      });
+    });
+
+    it(`Deve validar campos principais do usuário com ID ${userId}`, () => {
+      cy.request({
+        method: 'GET',
+        url: `${userBaseEndpoint}/${userId}`,
+        headers: {
+          Authorization: `Bearer ${Cypress.env('token')}`
+        }
+      }).then((res) => {
+        const user = res.body;
+        cy.validateUserFields(user); // assumindo que essa função existe
+
+        if (userId === 1) {
+          expect(user.firstName).to.eq(expectedFirstName);
+          expect(user.lastName).to.eq(expectedLastName);
+          expect(user.email).to.include(expectedEmailDomain);
+        }
+      });
+    });
+  });
+
+  it('Deve falhar ao buscar usuário inexistente', () => {
     cy.request({
-      url: '/users/99999',
+      method: 'GET',
+      url: `${userBaseEndpoint}/99999`,
       failOnStatusCode: false,
+      headers: {
+        Authorization: `Bearer ${Cypress.env('token')}`
+      }
     }).then((res) => {
-      expect(res.status).to.eq(404)
+      expect(res.status).to.eq(404);
+    });
+  });
+
+  it('Deve validar tipos de dados e integridade do contrato para ID 1', () => {
+    cy.request({
+      method: 'GET',
+      url: `${userBaseEndpoint}/1`,
+      headers: {
+        Authorization: `Bearer ${Cypress.env('token')}`
+      }
+    }).then((res) => {
+      const user = res.body;
+      expect(user.id).to.be.a('number');
+      expect(user.firstName).to.be.a('string');
+      expect(user.lastName).to.be.a('string');
+      expect(user.age).to.be.a('number');
+      expect(user.address).to.be.an('object');
+      expect(user.bank).to.be.an('object');
+      expect(user.hair).to.be.an('object');
+    });
+  });
+
+
+  it('Simula erro 500 no servidor na rota GET /users/1', () => {
+    cy.intercept('GET', '**/users/1', {
+      statusCode: 500,
+      body: { error: 'Erro interno do servidor' }
+    }).as('getUserError')
+
+    // Dispara a chamada fetch, que seu app faz na página carregada
+    // Se for manual, pode usar cy.window().then(win => win.fetch(...))
+
+    cy.window().then((win) => {
+      return win.fetch('/users/1')
+    })
+
+    cy.wait('@getUserError').then(({ response }) => {
+      expect(response.statusCode).to.eq(500)
+      expect(response.body).to.have.property('error', 'Erro interno do servidor')
     })
   })
 
-  it('Valida tipos de dados', () => {
-    cy.request('/users/1').then((res) => {
-      expect(res.body.id).to.be.a('number')
-      expect(res.body.firstName).to.be.a('string')
-      expect(res.body.lastName).to.be.a('string')
+  it('Simula delay de 3 segundos na resposta da API GET /users/1', () => {
+    cy.intercept('GET', '**/users/1', (req) => {
+      req.on('response', (res) => {
+        res.setDelay(3000) // delay em ms
+      })
+    }).as('getUserDelay')
+
+    cy.window().then((win) => {
+      return win.fetch('/users/1')
+    })
+
+    const startTime = Date.now()
+
+    cy.wait('@getUserDelay').then(() => {
+      const duration = Date.now() - startTime
+      expect(duration).to.be.gte(3000)
     })
   })
-})
+
+
+  
+});

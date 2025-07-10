@@ -1,19 +1,22 @@
-const { defineConfig } = require("cypress");
-require("dotenv").config(); // carrega as variáveis do .env
+import { defineConfig } from 'cypress'
+import * as dotenv from 'dotenv'
 
-module.exports = defineConfig({
+dotenv.config()
+
+export default defineConfig({
   e2e: {
-    baseUrl: process.env.BASE_URL || "https://dummyjson.com", // fallback
+    baseUrl: process.env.BASE_URL || 'https://dummyjson.com',
+    supportFile: 'cypress/support/e2e.js',
     env: {
-      LOGIN_ENDPOINT: process.env.LOGIN_ENDPOINT,
-      USERS_ENDPOINT: process.env.USERS_ENDPOINT,
-      USER_BY_ID_ENDPOINT: process.env.USER_BY_ID_ENDPOINT,
-      CREATE_PRODUCT_ENDPOINT: process.env.CREATE_PRODUCT_ENDPOINT,
-      USERNAME: process.env.USERNAME,
-      PASSWORD: process.env.PASSWORD,
-    },
-    setupNodeEvents(on, config) {
-      // Aqui podem entrar plugins ou hooks
-    },
-  },
-});
+      login_endpoint: process.env.LOGIN_ENDPOINT,
+      users_endpoint: process.env.USERS_ENDPOINT,
+      user_by_id_endpoint: process.env.USER_BY_ID_ENDPOINT,
+      create_product_endpoint: process.env.CREATE_PRODUCT_ENDPOINT,
+      user: process.env.user,
+      pass: process.env.pass,
+      first_name: process.env.first_name,
+      last_name: process.env.last_name,
+      email_domain: process.env.email_domain,
+    }
+  }
+})

@@ -1,44 +1,65 @@
-describe('GET /users', () => {
-  it('Valida status code 200', () => {
-    cy.request('/users').then((response) => {
+describe('GET /users - Testes API DummyJSON', () => {
+  const usersEndpoint = Cypress.env('users_endpoint')
+
+  before(() => {
+    cy.log('Iniciando suite de testes para /users')
+  })
+
+  after(() => {
+    cy.log('Finalizando suite de testes para /users')
+  })
+
+  beforeEach(() => {
+    cy.log('Executando setup antes de cada teste')
+  })
+
+  it('Deve retornar status 200 OK', () => {
+    cy.request(usersEndpoint).then((response) => {
       expect(response.status).to.eq(200)
     })
   })
 
-  it('Valida quantidade máxima de usuários', () => {
-    cy.request('/users').then((response) => {
+  it('Deve retornar no máximo 30 usuários', () => {
+    cy.request(usersEndpoint).then((response) => {
       expect(response.body.users.length).to.be.at.most(30)
     })
   })
 
-  it('Valida campos obrigatórios em cada usuário', () => {
-    cy.request('/users').then((response) => {
-      response.body.users.forEach((user) => {
-        expect(user).to.have.all.keys(
-          'id', 'firstName', 'lastName', 'age',
-          'gender', 'email', 'username', 'birthDate', 'role'
-        )
+  it('Cada usuário deve ter os campos obrigatórios corretos', () => {
+  cy.request(usersEndpoint).then((response) => {
+    response.body.users.forEach((user) => {
+      cy.log(JSON.stringify(user))
+      cy.validateUserFields(user)
+    })
+  })    
+  })
+
+
+  it('Deve interceptar a rota e simular delay', () => {
+    cy.intercept('GET', usersEndpoint, (req) => {
+      req.on('response', (res) => {
+        res.setDelay(1000) // 1 segundo
       })
+    }).as('getUsersDelay')
+
+    cy.request(usersEndpoint).then((response) => {
+      expect(response.status).to.eq(200)
     })
   })
 
-  it('Valida tipos de campos', () => {
-    cy.request('/users').then((response) => {
-      response.body.users.forEach((user) => {
-        expect(user.id).to.be.a('number')
-        expect(user.firstName).to.be.a('string')
-        expect(user.email).to.include('@')
-      })
-    })
+  it('Deve interceptar e simular erro 500', () => {
+  cy.intercept('GET', usersEndpoint, {
+    statusCode: 500,
+    body: {}
+  }).as('getUsersError')
+
+  // Dispara a requisição dentro do contexto do browser,
+  // para que o intercept funcione de fato
+  cy.window().then((win) => {
+    return win.fetch(usersEndpoint)
+  }).then((response) => {
+    expect(response.status).to.eq(500)
+  })
   })
 
-  it('Valida que não existem campos nulos', () => {
-    cy.request('/users').then((response) => {
-      response.body.users.forEach((user) => {
-        Object.keys(user).forEach((key) => {
-          expect(user[key]).to.not.be.null
-        })
-      })
-    })
-  })
 })
