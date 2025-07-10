@@ -100,14 +100,15 @@ describe('API - Criação de Produto', () => {
     })
   })
 
-  it('Deve lidar corretamente com erro 500 do servidor (via fetch)', () => {
-  // Intercepta usando cy.intercept (funciona também para fetch)
+
+  it('Deve lidar corretamente com erro 500 do servidor (via fetch no browser)', () => {
   cy.intercept('POST', Cypress.env('create_product_endpoint'), {
     statusCode: 500,
     body: { message: 'Erro interno do servidor simulado' }
   }).as('createProduct500')
 
-  // Aqui usamos cy.window().then(win => win.fetch(...)) para demonstrar explicitamente o uso de fetch
+  cy.visit('/') // Para garantir contexto do window
+
   cy.window().then((win) => {
     return win.fetch(Cypress.env('create_product_endpoint'), {
       method: 'POST',
@@ -128,17 +129,21 @@ describe('API - Criação de Produto', () => {
         cy.log('Erro 500 tratado corretamente')
       })
   })
-})
 
-it('Deve falhar ao criar produto com preço negativo (via fetch)', () => {
+  cy.wait('@createProduct500')
+  })
+
+  it('Deve falhar ao criar produto com preço negativo (via fetch no browser)', () => {
   cy.intercept('POST', Cypress.env('create_product_endpoint'), (req) => {
     if (req.body && req.body.price < 0) {
       req.reply({
         statusCode: 400,
-        body: { message: "Preço inválido" }
+        body: { message: 'Preço inválido' }
       })
     }
   }).as('negativePriceIntercept')
+
+  cy.visit('/') // Para garantir contexto do window
 
   cy.window().then((win) => {
     return win.fetch(Cypress.env('create_product_endpoint'), {
@@ -160,7 +165,12 @@ it('Deve falhar ao criar produto com preço negativo (via fetch)', () => {
         cy.log('Erro 400 tratado corretamente')
       })
   })
-})
+
+  cy.wait('@negativePriceIntercept')
+  })
+
+
+ 
 
 
   afterEach(() => {

@@ -92,45 +92,44 @@ describe('Consulta de Usuário por ID', () => {
     });
   });
 
+  it('Simula erro 500 no servidor na rota GET /users/1 (via fetch no browser)', () => {
+  cy.intercept('GET', '**/users/1', {
+    statusCode: 500,
+    body: { error: 'Erro interno do servidor' }
+  }).as('getUserError')
 
-  it('Simula erro 500 no servidor na rota GET /users/1', () => {
-    cy.intercept('GET', '**/users/1', {
-      statusCode: 500,
-      body: { error: 'Erro interno do servidor' }
-    }).as('getUserError')
+  cy.visit('/') // Para ter contexto do window
 
-    // Dispara a chamada fetch, que seu app faz na página carregada
-    // Se for manual, pode usar cy.window().then(win => win.fetch(...))
-
-    cy.window().then((win) => {
-      return win.fetch('/users/1')
-    })
-
-    cy.wait('@getUserError').then(({ response }) => {
-      expect(response.statusCode).to.eq(500)
-      expect(response.body).to.have.property('error', 'Erro interno do servidor')
-    })
+  cy.window().then((win) => {
+    return win.fetch('/users/1')
   })
 
-  it('Simula delay de 3 segundos na resposta da API GET /users/1', () => {
-    cy.intercept('GET', '**/users/1', (req) => {
-      req.on('response', (res) => {
-        res.setDelay(3000) // delay em ms
-      })
-    }).as('getUserDelay')
+  cy.wait('@getUserError').then(({ response }) => {
+    expect(response.statusCode).to.eq(500)
+    expect(response.body).to.have.property('error', 'Erro interno do servidor')
+  })
+  })
 
-    cy.window().then((win) => {
-      return win.fetch('/users/1')
+  it('Simula delay de 3 segundos na resposta da API GET /users/1 (via fetch no browser)', () => {
+  cy.intercept('GET', '**/users/1', (req) => {
+    req.on('response', (res) => {
+      res.setDelay(3000) // delay em ms
     })
+  }).as('getUserDelay')
 
-    const startTime = Date.now()
+  cy.visit('/') // Para ter contexto do window
 
-    cy.wait('@getUserDelay').then(() => {
-      const duration = Date.now() - startTime
-      expect(duration).to.be.gte(3000)
-    })
+  cy.window().then((win) => {
+    return win.fetch('/users/1')
+  })
+
+  const startTime = Date.now()
+
+  cy.wait('@getUserDelay').then(() => {
+    const duration = Date.now() - startTime
+    expect(duration).to.be.gte(3000)
+  })
   })
 
 
-  
 });

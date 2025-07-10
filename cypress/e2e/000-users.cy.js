@@ -47,20 +47,6 @@ describe('GET /users - Testes API DummyJSON', () => {
     })
   })
 
-  it('Deve interceptar e simular erro 500', () => {
-  cy.intercept('GET', usersEndpoint, {
-    statusCode: 500,
-    body: {}
-  }).as('getUsersError')
-
-  // Dispara a requisição dentro do contexto do browser,
-  // para que o intercept funcione de fato
-  cy.window().then((win) => {
-    return win.fetch(usersEndpoint)
-  }).then((response) => {
-    expect(response.status).to.eq(500)
-  })
-  })
 
   it('Deve interceptar e simular erro 500 via fetch no browser', () => {
   cy.intercept('GET', usersEndpoint, {

@@ -61,99 +61,62 @@ describe('Autenticação - POST /auth/login', () => {
     })
   })
 
+  it('Simula erro 500 no servidor (via fetch no browser)', () => {
+  const loginEndpoint = Cypress.env('login_endpoint')
 
-  it('Simula erro 500 no servidor (via fetch)', () => {
-    cy.intercept('POST', Cypress.env('login_endpoint'), {
-      statusCode: 500,
-      body: { error: 'Erro interno do servidor' }
-    }).as('serverError')
-
-    cy.window().then((win) => {
-      return win.fetch(Cypress.env('login_endpoint'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: Cypress.env('user'),
-          password: Cypress.env('pass')
-        })
-      })
-    }).then((res) => {
-      expect(res.status).to.eq(500)
-    })
-
-    cy.wait('@serverError')
-  })
-
-  it('Simula delay na API (via fetch)', () => {
-    cy.intercept('POST', Cypress.env('login_endpoint'), (req) => {
-      req.on('response', (res) => {
-        res.setDelay(1000) // 1 segundo
-      })
-    }).as('delayedLogin')
-
-    cy.window().then((win) => {
-      return win.fetch(Cypress.env('login_endpoint'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: Cypress.env('user'),
-          password: Cypress.env('pass')
-        })
-      })
-    }).then((res) => {
-      expect(res.status).to.eq(200)
-    })
-
-    cy.wait('@delayedLogin')
-  })
-
-  it('Simula erro 500 no servidor (via cy.request)', () => {
-  cy.intercept('POST', Cypress.env('login_endpoint'), {
+  cy.intercept('POST', loginEndpoint, {
     statusCode: 500,
     body: { error: 'Erro interno do servidor' }
   }).as('serverError')
 
-  cy.request({
-    method: 'POST',
-    url: Cypress.env('login_endpoint'),
-    headers: { 'Content-Type': 'application/json' },
-    body: {
-      username: Cypress.env('user'),
-      password: Cypress.env('pass')
-    },
-    failOnStatusCode: false // para não falhar automaticamente no status 500
+  cy.visit('/') // Abre a aplicação para ter contexto do browser
+
+  cy.window().then((win) => {
+    return win.fetch(loginEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: Cypress.env('user'),
+        password: Cypress.env('pass')
+      }),
+    })
   }).then((res) => {
     expect(res.status).to.eq(500)
   })
 
   cy.wait('@serverError')
-})
+  })
 
-it('Simula delay na API (via cy.request)', () => {
-  cy.intercept('POST', Cypress.env('login_endpoint'), (req) => {
+  it('Simula delay na API (via fetch no browser)', () => {
+  const loginEndpoint = Cypress.env('login_endpoint')
+
+  cy.intercept('POST', loginEndpoint, (req) => {
     req.on('response', (res) => {
-      res.setDelay(1000) // 1 segundo de delay
+      res.setDelay(1000) // 1 segundo de delay simulado
     })
   }).as('delayedLogin')
 
-  cy.request({
-    method: 'POST',
-    url: Cypress.env('login_endpoint'),
-    headers: { 'Content-Type': 'application/json' },
-    body: {
-      username: Cypress.env('user'),
-      password: Cypress.env('pass')
-    }
+  cy.visit('/') // Abre a aplicação para ter contexto do browser
+
+  cy.window().then((win) => {
+    return win.fetch(loginEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: Cypress.env('user'),
+        password: Cypress.env('pass')
+      }),
+    })
   }).then((res) => {
     expect(res.status).to.eq(200)
   })
 
   cy.wait('@delayedLogin')
-})
+  })
+
+
+
+
 
 
 })
