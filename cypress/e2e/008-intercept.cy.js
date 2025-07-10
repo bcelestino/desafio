@@ -1,13 +1,15 @@
 // cypress/e2e/008-intercept.cy.js
 
-describe('Intercept API - Erros simulados e delays (fetch)', () => {
+describe('Intercept API - Erros simulados e delays (via fetch no browser)', () => {
 
   describe('Usuários - GET /users', () => {
-    it('Simula erro 500 no GET /users', () => {
+    it('Simula erro 500 no GET /users (via fetch no browser)', () => {
       cy.intercept('GET', '**/users', {
         statusCode: 500,
         body: { error: 'Erro simulado' },
       }).as('getUsersError')
+
+      cy.visit('/')
 
       cy.window().then(win => win.fetch('/users'))
 
@@ -17,12 +19,14 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
       })
     })
 
-    it('Simula delay de 3s no GET /users', () => {
+    it('Simula delay de 3s no GET /users (via fetch no browser)', () => {
       cy.intercept('GET', '**/users', (req) => {
         req.on('response', (res) => {
           res.setDelay(3000)
         })
       }).as('getUsersDelay')
+
+      cy.visit('/')
 
       cy.window().then(win => win.fetch('/users'))
 
@@ -33,11 +37,13 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
   })
 
   describe('Usuários - GET /users/:id', () => {
-    it('Simula erro 404 no GET /users/:id', () => {
+    it('Simula erro 404 no GET /users/:id (via fetch no browser)', () => {
       cy.intercept('GET', '**/users/9999', {
         statusCode: 404,
         body: { error: 'Usuário não encontrado' },
       }).as('getUserNotFound')
+
+      cy.visit('/')
 
       cy.window().then(win => win.fetch('/users/9999'))
 
@@ -49,11 +55,13 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
   })
 
   describe('Login - POST /auth/login', () => {
-    it('Simula erro 401 no POST /auth/login', () => {
+    it('Simula erro 401 no POST /auth/login (via fetch no browser)', () => {
       cy.intercept('POST', '**/auth/login', {
         statusCode: 401,
         body: { error: 'Credenciais inválidas' },
       }).as('postLoginUnauthorized')
+
+      cy.visit('/')
 
       cy.window().then(win =>
         win.fetch('/auth/login', {
@@ -69,12 +77,14 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
       })
     })
 
-    it('Simula delay de 2s no POST /auth/login', () => {
+    it('Simula delay de 2s no POST /auth/login (via fetch no browser)', () => {
       cy.intercept('POST', '**/auth/login', (req) => {
         req.on('response', (res) => {
           res.setDelay(2000)
         })
       }).as('postLoginDelay')
+
+      cy.visit('/')
 
       cy.window().then(win =>
         win.fetch('/auth/login', {
@@ -91,11 +101,13 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
   })
 
   describe('Produtos - POST /auth/products/add', () => {
-    it('Simula erro 400 no POST /auth/products/add', () => {
+    it('Simula erro 400 no POST /auth/products/add (via fetch no browser)', () => {
       cy.intercept('POST', '**/auth/products/add', {
         statusCode: 400,
         body: { error: 'Dados do produto inválidos' },
       }).as('postProductBadRequest')
+
+      cy.visit('/')
 
       cy.window().then(win =>
         win.fetch('/auth/products/add', {
@@ -111,12 +123,14 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
       })
     })
 
-    it('Simula delay de 2.5s no POST /auth/products/add', () => {
+    it('Simula delay de 2.5s no POST /auth/products/add (via fetch no browser)', () => {
       cy.intercept('POST', '**/auth/products/add', (req) => {
         req.on('response', (res) => {
           res.setDelay(2500)
         })
       }).as('postProductDelay')
+
+      cy.visit('/')
 
       cy.window().then(win =>
         win.fetch('/auth/products/add', {
@@ -127,7 +141,6 @@ describe('Intercept API - Erros simulados e delays (fetch)', () => {
       )
 
       cy.wait('@postProductDelay').then(({ response }) => {
-        // Pode ser 401 se token faltar, ou 200/201 se autorizado
         expect(response.statusCode).to.be.oneOf([200, 201, 401])
       })
     })
