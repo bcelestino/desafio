@@ -111,4 +111,49 @@ describe('Autenticação - POST /auth/login', () => {
     cy.wait('@delayedLogin')
   })
 
+  it('Simula erro 500 no servidor (via cy.request)', () => {
+  cy.intercept('POST', Cypress.env('login_endpoint'), {
+    statusCode: 500,
+    body: { error: 'Erro interno do servidor' }
+  }).as('serverError')
+
+  cy.request({
+    method: 'POST',
+    url: Cypress.env('login_endpoint'),
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      username: Cypress.env('user'),
+      password: Cypress.env('pass')
+    },
+    failOnStatusCode: false // para não falhar automaticamente no status 500
+  }).then((res) => {
+    expect(res.status).to.eq(500)
+  })
+
+  cy.wait('@serverError')
+})
+
+it('Simula delay na API (via cy.request)', () => {
+  cy.intercept('POST', Cypress.env('login_endpoint'), (req) => {
+    req.on('response', (res) => {
+      res.setDelay(1000) // 1 segundo de delay
+    })
+  }).as('delayedLogin')
+
+  cy.request({
+    method: 'POST',
+    url: Cypress.env('login_endpoint'),
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      username: Cypress.env('user'),
+      password: Cypress.env('pass')
+    }
+  }).then((res) => {
+    expect(res.status).to.eq(200)
+  })
+
+  cy.wait('@delayedLogin')
+})
+
+
 })

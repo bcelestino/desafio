@@ -62,4 +62,25 @@ describe('GET /users - Testes API DummyJSON', () => {
   })
   })
 
+  it('Deve interceptar e simular erro 500 via fetch no browser', () => {
+  cy.intercept('GET', usersEndpoint, {
+    statusCode: 500,
+    body: { error: 'Erro interno do servidor simulado' }
+  }).as('getUsersError')
+
+  cy.visit('/') // sua página base, para carregar o contexto do browser
+
+  cy.window().then((win) => {
+    return win.fetch(usersEndpoint)
+  }).then((response) => {
+    expect(response.status).to.eq(500)
+  })
+
+  cy.wait('@getUsersError')
+  })
+
+
+
+
+
 })
