@@ -1,9 +1,10 @@
-import { defineConfig } from 'cypress'
-import * as dotenv from 'dotenv'
+// cypress.config.js
+const { defineConfig } = require('cypress')
+const dotenv = require('dotenv')
 
 dotenv.config()
 
-export default defineConfig({
+module.exports = defineConfig({
   e2e: {
     baseUrl: process.env.BASE_URL || 'https://dummyjson.com',
     supportFile: 'cypress/support/e2e.js',
@@ -17,6 +18,6 @@ export default defineConfig({
       first_name: process.env.first_name,
       last_name: process.env.last_name,
       email_domain: process.env.email_domain,
-    }
-  }
+    },
+  },
 })
