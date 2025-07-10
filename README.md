@@ -15,19 +15,6 @@ Este projeto contém um conjunto de automações completas, incluindo testes end
 
 ---
 
-## ⚙️ Dependências (package.json)
-
-```json
-"devDependencies": {
-  "chai-json-schema": "^1.5.1",
-  "cypress": "^14.5.1",
-  "dotenv": "^17.2.0",
-  "jsonwebtoken": "^9.0.2",
-  "newman": "^6.2.1"
-}
-
-```json
-
 ## 📁 Estrutura do projeto
 
 ├── cypress/
